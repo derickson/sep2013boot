@@ -7,8 +7,9 @@ cd to the directory you want the project folder to
 git clone https://github.com/derickson/sep2013boot.git
 
 cd sep2013boot
-git branch dev
-git checkout dev
+
+git branch dev // create branch to isolate changes
+git checkout dev // work in branch
 
 // make your changes
 
@@ -21,3 +22,5 @@ git merge dev        // pull changes from dev to master
 
 
 git push -u origin master  // push data back to github
+
+git branch -d dev // when done, delete your working branch
