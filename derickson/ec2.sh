@@ -64,9 +64,11 @@ function stepPushKeyAndSetup {
     cat ~/.ssh/id_rsa.pub | ssh -i $pemfile -o StrictHostKeyChecking=no ec2-user@$publichostname \
         'mkdir -p .ssh; chmod og-w .ssh; cat >>.ssh/authorized_keys'
     
+	sleep 2
+
     # do setup
     scp ./setup.sh ec2-user@$publichostname:.
-    ssh -t ec2-user@$publichostname sudo bash ./setup.sh
+    ssh -t ec2-user@$publichostname sudo bash ./setup.sh > setup.log
 
     # copy more stuff over
     #scp -r mms-agent ec2-user@$ip:
@@ -87,13 +89,16 @@ function refeshHostExports {
 }
 
 function sleep60 {
-	echo "Sleeping for 60 seconds waiting for the machine to stand up"
-	echo "60"; sleep 10
-	echo "50"; sleep 10
-	echo "40"; sleep 10
-	echo "30"; sleep 10
-	echo "20"; sleep 10
-	echo "10"; sleep 10
+	echo "Sleeping for 3 minutes waiting for the machine to stand up"
+	echo "180"; sleep 20
+	echo "160"; sleep 20
+	echo "140"; sleep 20
+	echo "120"; sleep 20
+	echo "100"; sleep 20
+	echo "80"; sleep 20
+	echo "60"; sleep 20
+	echo "40"; sleep 20
+	echo "20"; sleep 20
 	echo "0"
 }
 
