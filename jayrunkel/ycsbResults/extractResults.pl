@@ -16,26 +16,29 @@ my $keepGoing = 1;
 my $foundSummary = 0;
 my @results = ();
 
+print "File: $file\n";
+
+print "Threads,Connections,RunTime,Throughput\n";
 
 open(my $fh, '<', $file) or die "Could not open '$file' $!\n";
  while ( $line = <$fh>) {
      my %result = ();
      
      if ($line =~ m/$commandLineRegEx/) {
-         print "Threads: $1 - Connections: $2\n";
+#         print "Threads: $1 - Connections: $2\n";
          $result{'threads'} = $1;
          $result{'connections'} = $2;
 
          $foundSummary = 0;
          $keepGoing = 1;
              
-         while (($line = <$fh>) && $keepGoing) {
+         while ((defined $fh) && ($line = <$fh>) && $keepGoing) {
 #             print "$line\n";
              
              if ($line =~ m/$overallRegEx/) {
                  $foundSummary = 1;
-                 print $line;
-                 print "Summary - $1 : $2\n";
+#                 print $line;
+#                 print "Summary - $1 : $2\n";
                  $result{$1} = $2;
              }
              elsif ($foundSummary) {     #We previously found summary results, but now there aren't anymore
