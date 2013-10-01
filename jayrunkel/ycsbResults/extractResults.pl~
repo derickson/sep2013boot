@@ -1,0 +1,54 @@
+#!/usr/bin/perl -w
+# extractResults.pl --- Extract results from ycsb log
+# Author: Jay Runkel <jayrunkel@RunkelMac.local>
+# Created: 01 Oct 2013
+# Version: 0.01
+
+use warnings;
+use strict;
+
+my $commandLineRegEx = '^Command line:';
+my $overallRegEx = '^\[Overall\]';
+
+my $file = $ARGV[0] or die "Need to provide log file on the command line\n";
+
+open(my $fh, '<', $file) or die "Could not open '$file' $!\n";
+while ( my $line = <$fh>) {
+    if ($line ~= m/$commandLineReg/) {
+        
+    }
+}
+
+__END__
+
+=head1 NAME
+
+extractResults.pl - Describe the usage of script briefly
+
+=head1 SYNOPSIS
+
+extractResults.pl [options] args
+
+      -opt --long      Option description
+
+=head1 DESCRIPTION
+
+Stub documentation for extractResults.pl, 
+
+=head1 AUTHOR
+
+Jay Runkel, E<lt>jayrunkel@RunkelMac.localE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013 by Jay Runkel
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 BUGS
+
+None reported... yet.
+
+=cut
