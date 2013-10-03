@@ -11,15 +11,76 @@ use strict;
 my $commandLineRegEx = '^Command line:.*-threads\s(\d+).*mongodb.maxconnections=(\d+)';
 my $overallRegEx = '^\[OVERALL\].*(RunTime|Throughput).*?(\d+\.\d+)$';
 
+sub printHeader($$$$$) {
+    my $label = uc(shift);
+    my $threadMin = shift;
+    my $connMin = shift;
+    my $connMax = shift;
+    my $results = shift;
+
+    my $resultRef;
+#    print "$threadMin - $connMin - $connMax - $results\n";
+    
+    print "$label\n";
+    print "Thread";
+
+    my $t= $threadMin;
+    for (my $c = $connMin; $c <= $connMax; $c++) {
+        my $key = $t . " " . $c;
+        $resultRef = $results->{$key};
+        if ($resultRef) {
+            print ",Conn $c";
+        }
+    }
+    
+    print "\n";
+}
+
+sub printResults($$$$$$) {
+    my $parameter = shift;
+    my $threadMin = shift;
+    my $threadMax = shift;
+    my $connMin = shift;
+    my $connMax = shift;
+    my $results = shift;
+
+    my $validRow = 0;
+    # Print results
+    for (my $t = $threadMin; $t <= $threadMax; $t++) {
+        $validRow = 0;
+
+        for (my $c = $connMin; $c <= $connMax; $c++) {
+            my $key = $t . " " . $c;
+            my $resultRef = $results->{$key};
+            if ($resultRef) {
+                $validRow =1;
+                print "$t" if $c == $connMin;
+                print ",$resultRef->{$parameter}";
+            }
+        }
+        print "\n" if $validRow;
+    }
+}
+
+
+
+
 my $file = $ARGV[0] or die "Need to provide log file on the command line\n";
 my $line;
 my $keepGoing = 1;
 my $foundSummary = 0;
-my @results = ();
+my %results = ();
+my $key;
+my $threadMin = 1000000;
+my $threadMax = 0;
+my $connMin=1000000;
+my $connMax=0;
+my $resultRef;
+
+
 
 print "File: $file\n";
 
-print "Threads,Connections,RunTime,Throughput\n";
 
 open(my $fh, '<', $file) or die "Could not open '$file' $!\n";
  while ( $line = <$fh>) {
@@ -29,7 +90,11 @@ open(my $fh, '<', $file) or die "Could not open '$file' $!\n";
 #         print "Threads: $1 - Connections: $2\n";
          $result{'threads'} = $1;
          $result{'connections'} = $2;
-
+         $threadMin = $1 if $threadMin > $1;
+         $threadMax = $1 if $threadMax < $1;
+         $connMin = $2 if $connMin > $2;
+         $connMax = $2 if $connMax < $2;
+         
          $foundSummary = 0;
          $keepGoing = 1;
              
@@ -47,20 +112,32 @@ open(my $fh, '<', $file) or die "Could not open '$file' $!\n";
                  $keepGoing = 0;
              }
          }
-         push(@results, \%result);
+         $key = $result{'threads'} . " " . $result{'connections'};
+         $results{$key} = \%result;
+         #push(@results, \%result);
      }
 }
 
-my $resultRef;
-foreach my $resultRef (@results) {
-    print "$resultRef->{'threads'},$resultRef->{'connections'},$resultRef->{'RunTime'},$resultRef->{'Throughput'}\n";
-    # print "$resultRef->{'threads'}\n";
-    # print "$resultRef->{'connections'}\n";
-    # print "$resultRef->{'RunTime'}\n";
-    # print "$resultRef->{'Throughput'}\n";
-         
 
-}
+
+printHeader("Throughput", $threadMin, $connMin, $connMax, \%results);
+printResults("Throughput", $threadMin, $threadMax, $connMin, $connMax, \%results);
+
+print "\n\n";
+
+printHeader("RunTime", $threadMin, $connMin, $connMax, \%results);
+printResults("RunTime", $threadMin, $threadMax, $connMin, $connMax, \%results);
+
+    
+
+#print "Threads,Connections,RunTime,Throughput\n";
+# foreach my $resultRef (@results) {
+#     print "$resultRef->{'threads'},$resultRef->{'connections'},$resultRef->{'RunTime'},$resultRef->{'Throughput'}\n";
+#     # print "$resultRef->{'threads'}\n";
+#     # print "$resultRef->{'connections'}\n";
+#     # print "$resultRef->{'RunTime'}\n";
+#     # print "$resultRef->{'Throughput'}\n";
+#}
 
 __END__
 
